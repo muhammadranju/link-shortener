@@ -31,6 +31,7 @@ exports.createUrl = async (req, res) => {
     shortUrl, // short url
     redirectUrl: bodyUrl, // original url
     visitHistory: [], // visit history
+    limit: 100, // limit
   });
 
   // save url
@@ -55,10 +56,20 @@ exports.getUrl = async (req, res) => {
     });
   }
 
+  // check if limit is reached
+  if (url.limit === 0) {
+    return res.status(400).json({
+      message: "Limit reached",
+    });
+  }
+
   // add visit history
   url.visitHistory.push({
     timestamp: new Date(),
   });
+
+  // decrement limit
+  url.limit -= 1;
 
   // save url
   await url.save();
